@@ -64,7 +64,7 @@ const Profile = () => {
         <div className="flex flex-col items-center space-y-4">
           <div className="relative">
             <img
-              src={role === "chef" ? "/placeholder.svg" : customer}
+              src={role === "chef" ? chef.profilePicture : customer}
               alt="Profile"
               className="h-48 w-48 rounded-full object-cover"
             />
@@ -78,50 +78,80 @@ const Profile = () => {
           </div>
           <div className="text-center">
             <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold">{chef ? `${chef.firstname} ${chef.lastname}` : `${user.firstName} ${user.lastName}`}</h2>
+              <h2 className="text-2xl font-bold">
+                {chef
+                  ? `${chef.name}`
+                  : `${user.firstName} ${user.lastName}`}
+              </h2>
               <BadgeCheck className="h-5 w-5 text-blue-500" />
             </div>
-            <p className="text-muted-foreground">{chef ? "Chef" : user.activePlan?.type || "No active plan"}</p>
+            <p className="text-muted-foreground">
+              {chef ? "Chef" : user.activePlan?.type || "No active plan"}
+            </p>
           </div>
         </div>
-
         {/* Profile Information */}
         <Card>
           <CardHeader>
             <CardTitle>Profile Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="space-y-2">
-              {role !== "chef" && <UserCalendar userId={userId}/>}
-            </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1">
                 <Label>Full Name</Label>
-                <p>{chef ? `${chef.firstname} ${chef.lastname}` : `${user.firstName} ${user.lastName}`}</p>
+                <p>{chef ? chef.name : `${user.firstName} ${user.lastName}`}</p>
               </div>
               <div className="space-y-1">
                 <Label>Email</Label>
-                <p>{chef ? chef.email : user.email}</p>
+                <p>{chef ? "N/A" : user.email}</p>
               </div>
               {chef ? (
                 <>
-                  <div className="space-y-1">
-                    <Label>Experience</Label>
-                    <p>{chef.experience} years</p>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Rating</Label>
-                    <p>{chef.rating}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Speciality</Label>
-                    <p>{chef.speciality.join(", ")}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Status</Label>
-                    <p>{chef.isActive ? "Active" : "Inactive"}</p>
-                  </div>
-                </>
+                <div className="space-y-1">
+                  <Label>Gender</Label>
+                  <p>{chef.gender}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Experience</Label>
+                  <p>{chef.experienceYears}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Cuisines</Label>
+                  <p>{chef.cuisines.join(", ")}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Current Area</Label>
+                  <p>{chef.currentArea}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Current City</Label>
+                  <p>{chef.currentCity}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Travel Mode</Label>
+                  <p>{chef.travelMode}</p>
+                </div>
+                <div className="space-y-1">
+                  <Label>Resume</Label>
+                  <a href={chef.resume} target="_blank" rel="noreferrer">
+                  <span className="text-red-500">
+                    View Resume
+                    </span>
+                  </a>
+                </div>
+                <div className="space-y-1">
+                  <Label>Character Certificate</Label>
+                  <a
+                    href={chef.characterCertificate}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span className="text-red-500">
+                    View Certificate
+                    </span>
+                  </a>
+                </div>
+              </>
               ) : (
                 <>
                   <div className="space-y-1">

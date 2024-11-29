@@ -4,15 +4,27 @@ import axios from "axios";
 
 interface Chef {
   _id: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  experience: number;
-  rating: number;
-  speciality: string[];
-  isActive: boolean;
+  name: string;
+  email?: string;
+  canCook: boolean;
+  characterCertificate?: string;
+  cooksNonVeg: boolean;
   createdAt: string;
+  cuisines: string[];
+  currentArea: string;
+  currentCity: string;
+  currentSalary: number;
+  experienceYears: string;
+  gender: string;
+  preferredCities: string[];
+  previousWorkplace: any[];
+  profilePicture?: string;
+  readingLanguage: string;
+  readyForHomeKitchen: boolean;
+  resume?: string;
+  travelMode: string;
   updatedAt: string;
+  __v: number;
 }
 
 interface ApiResponse {
@@ -82,22 +94,24 @@ const ChefService = () => {
   const formatChefData = (chefs: Chef[]) => {
     return chefs.map(chef => ({
       _id: chef._id,
-      firstName: chef.firstname, // mapping to match UserTable expected format
-      lastName: chef.lastname,
-      email: chef.email,
-      experience: chef.experience,
-      rating: chef.rating,
-      speciality: chef.speciality.join(', '), // converting array to string
-      status: chef.isActive ? 'Active' : 'Inactive'
+      firstName: chef.name.split(' ')[0], // Splitting name into first and last
+      lastName: chef.name.split(' ').slice(1).join(' '),
+      email: chef.email || 'N/A',
+      experience: chef.experienceYears,
+      rating: 'N/A', // No rating in new interface
+      speciality: chef.cuisines.join(', '),
+      status: chef.canCook ? 'Active' : 'Inactive'
     }));
   };
 
   return (
     <div className="bg-gray-100 h-full">
       <main className="p-4 md:p-8">
-        
-
-        <UserTable data={formatChefData(chefs)} type="chef" fetchChefs={fetchChefs} />
+        <UserTable 
+          data={formatChefData(chefs)} 
+          type="chef" 
+          fetchChefs={fetchChefs} 
+        />
 
         {totalPages > 1 && (
           <div className="mt-4 flex justify-end gap-2">

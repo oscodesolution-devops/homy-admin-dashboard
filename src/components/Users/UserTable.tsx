@@ -6,6 +6,7 @@ import { Search } from 'lucide-react'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+
 // Define the User type
 interface User {
   _id: string;
@@ -15,8 +16,8 @@ interface User {
   phoneNumber?: number;
   isNewUser?: boolean;
   address?: string;
-  experience?: number;
-  rating?: number;
+  experience?: string;
+  rating?: number| string;
   speciality?: string; // converting array to string
   status?: string;
   createdAt?: string;
