@@ -62,6 +62,7 @@ const ChefService = () => {
       });
       if (response.data.success) {
         setChefs(response.data.data.chefs);
+        console.log(response.data.data.chefs);
         setTotalPages(response.data.data.totalPages);
       } else {
         console.log(response.data.status.message)

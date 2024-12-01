@@ -5,7 +5,9 @@ import Dashboard from "@/pages/Dashboard";
 import ImageGallery from "@/pages/ImagesGallery";
 import Login from "@/pages/Login";
 import Orders from "@/pages/Orders";
+import Plans from "@/pages/Plans";
 import Profile from "@/pages/Profile";
+import Query from "@/pages/Query";
 import UserManagement from "@/pages/UserManagement";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
@@ -95,6 +97,26 @@ const Router: React.FC = () => {
             <ProtectedRoute>
               <Layout>
                 <ImageGallery/>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/plans"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Plans />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/query"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Query />
               </Layout>
             </ProtectedRoute>
           }

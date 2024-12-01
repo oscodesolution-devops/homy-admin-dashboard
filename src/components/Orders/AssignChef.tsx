@@ -18,8 +18,8 @@ import {
 
 interface Chef {
   _id: string;
-  firstname: string;
-  lastname: string;
+  name: string;
+  
 }
 
 interface AssignChefButtonProps {
@@ -47,6 +47,7 @@ export function AssignChefButton({ orderId, fetchOrders }: AssignChefButtonProps
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+      console.log(response.data.data)
       if (response.data.success) {
         setChefs(response.data.data.chefs);
       } else {
@@ -62,7 +63,7 @@ export function AssignChefButton({ orderId, fetchOrders }: AssignChefButtonProps
 
   const handleAssign = async () => {
     if (!selectedChef) return;
-
+    console.log(selectedChef);
     setAssigning(true);
     try {
       const response = await axios.post(`/admin/orders/${orderId}/assign-chef`,
@@ -113,7 +114,7 @@ export function AssignChefButton({ orderId, fetchOrders }: AssignChefButtonProps
               <SelectContent>
                 {chefs.map((chef) => (
                   <SelectItem key={chef._id} value={chef._id}>
-                    {chef.firstname} {chef.lastname}
+                    {chef.name}
                   </SelectItem>
                 ))}
               </SelectContent>

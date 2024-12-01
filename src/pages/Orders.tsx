@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react'
-import OrderTable from '@/components/Orders/OrderTable'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Card, CardContent } from '@/components/ui/card'
-import axios from 'axios'
+import { useState, useEffect } from "react";
+import OrderTable from "@/components/Orders/OrderTable";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
+import axios from "axios";
+
 interface User {
   firstName: string;
   lastName: string;
 }
 
 interface Chef {
-  firstname: string;
-  lastname: string;
+  name:string;
 }
-// Define the shape of an order
+
 interface Order {
   _id: string;
   user: User;
@@ -27,7 +27,7 @@ interface Order {
   discountAmount: number;
   totalAmount: number;
   razorpayOrderId: string;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'failed';
+  status: "pending" | "confirmed" | "cancelled" | "failed";
   createdAt: string;
   updatedAt: string;
   expiresAt: string;
@@ -37,70 +37,107 @@ interface Order {
   razorpaySignature?: string;
 }
 
-type OrdersResponse = {
-  success: boolean
-  data: {
-    orders: Order[]
-  }
-}
-
 const Orders: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [sortColumn, setSortColumn] = useState<keyof Order>("createdAt");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [currentPage, pageSize]);
+
   const fetchOrders = async () => {
+    setIsLoading(true);
+    setError(null);
+    console.log("hello",currentPage)
     try {
-      setIsLoading(true)
-      const response = await axios.get<OrdersResponse>('/admin/orders', {
-        headers: {
+      const response = await axios.get(
+        `/admin/orders?page=${currentPage}&limit=${pageSize}`,
+        {
+          headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-      })
-      console.log(response)
-      if (!response.data.success) {
-        throw new Error('Failed to fetch orders')
       }
-      setOrders(response.data.data.orders)
-    } catch (err: any) {
-      setError(err.message || 'An unknown error occurred')
+      );
+      if (response.data.success) {
+        setOrders(response.data.data.orders);
+        setTotalPages(response.data.data.totalPages);
+      } else {
+        setError("Failed to fetch orders.");
+      }
+    } catch (error) {
+      setError("An error occurred while fetching orders.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-  useEffect(() => {
-    
+  };
 
-    fetchOrders()
-  }, [])
+  const handleSearch = (term: string) => setSearchTerm(term);
 
-  if (isLoading) {
-    return (
-      <Card className="w-full">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
+  const handleSort = (column: keyof Order) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
 
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>
-          Error loading orders: {error}
-        </AlertDescription>
-      </Alert>
-    )
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
+
+  const filteredOrders = orders.filter(
+    (order) =>
+      order.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    const aValue = a[sortColumn];
+    const bValue = b[sortColumn];
+    if (aValue === undefined || bValue === undefined) return 0;
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  if(isLoading){
+    return <>Loading...</>
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Orders</h1>
-      <OrderTable initialOrders={orders} fetchOrders={fetchOrders} />
-    </div>
-  )
-}
+    <Card>
+      <CardContent>
+        {error && (
+          <Alert>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        <OrderTable
+          orders={sortedOrders}
+          searchTerm={searchTerm}
+          setCurrentPage={setCurrentPage}
+          handleSearch={handleSearch}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
+          handleSort={handleSort}
+          pageSize={pageSize}
+          handlePageSizeChange={handlePageSizeChange}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          fetchOrders={fetchOrders}
+        />
+      </CardContent>
+    </Card>
+  );
+};
 
-export default Orders
+export default Orders;

@@ -5,8 +5,9 @@ import UserCalendar from "@/components/Users/UserCalendar"
 import axios from "axios"
 import { BadgeCheck, Pencil } from 'lucide-react'
 import { useEffect, useState } from "react"
-import { useLocation, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
 import customer from "../assets/Profile Boy Icon.svg"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>()
@@ -15,6 +16,7 @@ const Profile = () => {
   const [chef, setChef] = useState<any>(null)
   const location = useLocation()
   const { role } = location.state || {}
+  const navigate = useNavigate()
 
   const fetchUserDetails = async () => {
     try {
@@ -53,9 +55,28 @@ const Profile = () => {
     }
   }, [])
 
-  if ((!user && !chef) || (!userDetails && !chef)) {
-    return <div>Loading...</div>
+  const handleDialogClose = () => {
+    navigate("/usermanagement")
   }
+
+  if ((!user && !chef) || (!userDetails && !chef)) {
+    return (
+      <div>
+        Loading...
+        {!userDetails && (
+          <Dialog open={true} onOpenChange={handleDialogClose}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Insufficient Data</DialogTitle>
+              </DialogHeader>
+              <p>Not Enough Data to show. Sorry!</p>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+    )
+  }
+
 
   return (
     <main className="p-6 w-full flex justify-center gap-6">
@@ -97,14 +118,19 @@ const Profile = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
+            <div className="md:col-span-2">
+              {!chef && <UserCalendar userId={userId}/>}
+              </div>
               <div className="space-y-1">
                 <Label>Full Name</Label>
                 <p>{chef ? chef.name : `${user.firstName} ${user.lastName}`}</p>
               </div>
+              
               <div className="space-y-1">
                 <Label>Email</Label>
                 <p>{chef ? "N/A" : user.email}</p>
               </div>
+              
               {chef ? (
                 <>
                 <div className="space-y-1">

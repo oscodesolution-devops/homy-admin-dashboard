@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from "react";
 import { AssignChefButton } from "@/components/Orders/AssignChef";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +16,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Search,
+} from "lucide-react";
 
 interface User {
   firstName: string;
@@ -24,8 +31,7 @@ interface User {
 }
 
 interface Chef {
-  firstname: string;
-  lastname: string;
+  name: string;
 }
 
 interface Order {
@@ -42,7 +48,7 @@ interface Order {
   discountAmount: number;
   totalAmount: number;
   razorpayOrderId: string;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'failed';
+  status: "pending" | "confirmed" | "cancelled" | "failed";
   createdAt: string;
   updatedAt: string;
   expiresAt: string;
@@ -53,8 +59,18 @@ interface Order {
 }
 
 interface OrderTableProps {
-  initialOrders: Order[];
-  fetchOrders: ()=>void;
+  orders: Order[];
+  searchTerm: string;
+  handleSearch: (term: string) => void;
+  sortColumn: keyof Order;
+  sortDirection: "asc" | "desc";
+  handleSort: (column: keyof Order) => void;
+  pageSize: number;
+  handlePageSizeChange: (size: number) => void;
+  currentPage: number;
+  totalPages: number;
+  fetchOrders: () => void;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 interface StatusColorsType {
@@ -69,35 +85,23 @@ const statusColors: StatusColorsType = {
   pending: "bg-yellow-100 text-yellow-800",
   confirmed: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-800",
-  failed: "bg-gray-100 text-gray-800"
+  failed: "bg-gray-100 text-gray-800",
 };
 
-const OrderTable: React.FC<OrderTableProps> = ({ initialOrders,fetchOrders }) => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [sortColumn, setSortColumn] = useState<keyof Order>("createdAt");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
-
-  const filteredOrders = initialOrders.filter(order => 
-    order.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const sortedOrders = [...filteredOrders].sort((a, b) => {
-    const aValue = a[sortColumn];
-    const bValue = b[sortColumn];
-    if (aValue === undefined || bValue === undefined) {
-      return 0; // If either value is undefined, treat them as equal
-    }
-    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  const paginatedOrders = sortedOrders.slice((page - 1) * pageSize, page * pageSize);
-  const totalPages = Math.ceil(sortedOrders.length / pageSize);
-
+const OrderTable: React.FC<OrderTableProps> = ({
+  orders,
+  searchTerm,
+  handleSearch,
+  sortColumn,
+  sortDirection,
+  handleSort,
+  pageSize,
+  handlePageSizeChange,
+  currentPage,
+  setCurrentPage,
+  totalPages,
+  fetchOrders,
+}) => {
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -106,19 +110,6 @@ const OrderTable: React.FC<OrderTableProps> = ({ initialOrders,fetchOrders }) =>
     });
   };
 
-  const handlePageSizeChange = (newSize: number): void => {
-    setPageSize(newSize);
-    setPage(1); // Reset to first page when changing page size
-  };
-
-  const handleSort = (): void => {
-    if (sortColumn === "createdAt") {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn("createdAt");
-      setSortDirection("asc");
-    }
-  };
 
   return (
     <div className="container mx-auto py-10">
@@ -129,7 +120,9 @@ const OrderTable: React.FC<OrderTableProps> = ({ initialOrders,fetchOrders }) =>
             type="text"
             placeholder="Search by customer name"
             value={searchTerm}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleSearch(e.target.value)
+            }
             className="max-w-sm"
           />
         </div>
@@ -168,7 +161,9 @@ const OrderTable: React.FC<OrderTableProps> = ({ initialOrders,fetchOrders }) =>
               <TableHead>Action</TableHead>
               <TableHead
                 className="cursor-pointer"
-                onClick={handleSort}
+                onClick={() => {
+                  handleSort("createdAt");
+                }}
               >
                 Order Date
                 {sortColumn === "createdAt" && (
@@ -182,9 +177,11 @@ const OrderTable: React.FC<OrderTableProps> = ({ initialOrders,fetchOrders }) =>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedOrders.map((order) => (
+            {orders.map((order) => (
               <TableRow key={order._id}>
-                <TableCell className="font-medium">{order._id.slice(-6)}</TableCell>
+                <TableCell className="font-medium">
+                  {order._id.slice(-6)}
+                </TableCell>
                 <TableCell>{`${order.user.firstName} ${order.user.lastName}`}</TableCell>
                 <TableCell>{order.totalPeople}</TableCell>
                 <TableCell>
@@ -196,15 +193,25 @@ const OrderTable: React.FC<OrderTableProps> = ({ initialOrders,fetchOrders }) =>
                 <TableCell>{order.chefDayOff}</TableCell>
                 <TableCell>₹{order.totalAmount.toLocaleString()}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${statusColors[order.status]}`}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      statusColors[order.status]
+                    }`}
+                  >
+                    {order.status.charAt(0).toUpperCase() +
+                      order.status.slice(1)}
                   </span>
                 </TableCell>
                 <TableCell>
-                  {order.chef ? 
-                    <span className="text-sm text-gray-600">{`${order.chef.firstname} ${order.chef.lastname}`}</span> :
-                    <AssignChefButton orderId={order._id} fetchOrders={fetchOrders}/>
-                  }
+                  {order.chef ? (
+                    <span className="text-sm text-gray-600">{`${order.chef.name}`}</span>
+                  ) : (
+                    // <></>
+                    <AssignChefButton
+                      orderId={order._id}
+                      fetchOrders={fetchOrders}
+                    />
+                  )}
                 </TableCell>
                 <TableCell>{formatDate(order.createdAt)}</TableCell>
               </TableRow>
@@ -215,40 +222,58 @@ const OrderTable: React.FC<OrderTableProps> = ({ initialOrders,fetchOrders }) =>
 
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          Showing {(page - 1) * pageSize + 1} to{" "}
-          {Math.min(page * pageSize, sortedOrders.length)} of{" "}
-          {sortedOrders.length} entries
+          Showing {(currentPage - 1) * pageSize + 1} to{" "}
+          {Math.min(currentPage * pageSize, orders.length)} of {orders.length}{" "}
+          entries
         </div>
         <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setPage(1)}
-            disabled={page === 1}
+            onClick={() => {
+              setCurrentPage(()=>1); // Move to the first page
+               // Fetch orders after updating the state
+            }}
+            disabled={currentPage === 1}
           >
+        
             <ChevronsLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setPage(page - 1)}
-            disabled={page === 1}
+            onClick={() => {
+              if (currentPage > 1) {
+                setCurrentPage((prev)=>prev - 1); // Move to the previous page
+                
+              }
+            }}
+            disabled={currentPage === 1}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setPage(page + 1)}
-            disabled={page === totalPages}
+            onClick={() => {
+              console.log("hello")
+              if (currentPage < totalPages) {
+                setCurrentPage((prev)=>prev+1); // Move to the next page
+                
+              }
+            }}
+            disabled={currentPage === totalPages}
           >
+            h
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setPage(totalPages)}
-            disabled={page === totalPages}
+            onClick={() => {
+              setCurrentPage(()=>totalPages);
+            }}
+            disabled={currentPage === totalPages}
           >
             <ChevronsRight className="h-4 w-4" />
           </Button>

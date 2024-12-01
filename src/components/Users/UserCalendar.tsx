@@ -1,21 +1,21 @@
-import * as React from "react"
-import { format } from "date-fns"
-import { CalendarIcon } from 'lucide-react'
-import axios from "axios"
+import * as React from "react";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import axios from "axios";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "@/components/ui/hover-card"
+} from "@/components/ui/hover-card";
 
 interface MealSchedule {
   breakfast: string;
@@ -23,31 +23,42 @@ interface MealSchedule {
   dinner: string;
 }
 
-export default function UserCalendar({ userId }: { userId: string|undefined }) {
-  const [date, setDate] = React.useState<Date>(new Date())
-  const [mealSchedule, setMealSchedule] = React.useState<MealSchedule | null>(null)
-  const [isLoading, setIsLoading] = React.useState(false)
+export default function UserCalendar({
+  userId,
+}: {
+  userId: string | undefined;
+}) {
+  const [date, setDate] = React.useState<Date>(new Date());
+  const [mealSchedule, setMealSchedule] = React.useState<MealSchedule | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const fetchMealSchedule = async (date: Date) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await axios.post('/api/meal-schedule', {
-        userId,
-        date: format(date, 'yyyy-MM-dd')
-      }, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      const response = await axios.post(
+        "/admin/meal-schedule",
+        {
+          userId,
+          date: format(date, "yyyy-MM-dd"),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      })
-      setMealSchedule(response.data)
+      );
+      setMealSchedule(()=>response.data.data);
+      console.log(response.data.data);
     } catch (error) {
-      console.error('Error fetching meal schedule:', error)
-      setMealSchedule(null)
+      console.error("Error fetching meal schedule:", error);
+      setMealSchedule(null);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-
+  };
+console.log(mealSchedule?.lunch)
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -77,26 +88,40 @@ export default function UserCalendar({ userId }: { userId: string|undefined }) {
                     variant="ghost"
                     className={cn(
                       "h-9 w-9",
-                      !(props.displayMonth.getMonth() === dayDate.getMonth()) && "text-muted-foreground opacity-50 cursor-not-allowed"
+                      !(props.displayMonth.getMonth() === dayDate.getMonth()) &&
+                        "text-muted-foreground opacity-50 cursor-not-allowed"
                     )}
-                    onMouseEnter={() => fetchMealSchedule(dayDate)}
+                    onClick={() => fetchMealSchedule(dayDate)}
                   >
                     {dayDate && format(dayDate, "d").toString()}
                   </Button>
                 </HoverCardTrigger>
                 <HoverCardContent className="w-80">
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">{format(dayDate, "MMMM d, yyyy")} Meal Plan</p>
+                    <p className="text-sm font-medium">
+                      {format(dayDate, "MMMM d, yyyy")} Meal Plan
+                    </p>
                     {isLoading ? (
-                      <p className="text-sm text-muted-foreground">Loading meal schedule...</p>
+                      <p className="text-sm text-muted-foreground">
+                        Loading meal schedule...
+                      </p>
                     ) : mealSchedule ? (
                       <>
-                        <p className="text-sm">Breakfast: {mealSchedule.breakfast}</p>
-                        <p className="text-sm">Lunch: {mealSchedule.lunch}</p>
-                        <p className="text-sm">Dinner: {mealSchedule.dinner}</p>
+                        <p className="text-sm">
+                          Breakfast:{" "}
+                          {mealSchedule?.breakfast || "No breakfast planned"}
+                        </p>
+                        <p className="text-sm">
+                          Lunch: {mealSchedule?.lunch || "No lunch planned" }
+                        </p>
+                        <p className="text-sm">
+                          Dinner: {mealSchedule?.dinner || "No dinner planned"}
+                        </p>
                       </>
                     ) : (
-                      <p className="text-sm text-muted-foreground">No meals planned for this day</p>
+                      <p className="text-sm text-muted-foreground">
+                        No meals planned for this day
+                      </p>
                     )}
                   </div>
                 </HoverCardContent>
@@ -106,5 +131,5 @@ export default function UserCalendar({ userId }: { userId: string|undefined }) {
         />
       </PopoverContent>
     </Popover>
-  )
+  );
 }

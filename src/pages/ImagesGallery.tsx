@@ -19,9 +19,7 @@ interface Image {
   imageUrl: string;
 }
 
-const Api = axios.create({
-  baseURL: "http://localhost:3000/", // Set a different baseURL here
-});
+
 
 const ImageGallery: React.FC = () => {
   const { toast } = useToast();
@@ -36,7 +34,7 @@ const ImageGallery: React.FC = () => {
   // Fetch images from the server
   const fetchImages = async (): Promise<void> => {
     try {
-      const response = await Api.get("/images");
+      const response = await axios.get("/images/");
        // Specify response type as `Image[]`
       setImages(response.data.data.images);
     } catch (error: any) {
@@ -71,7 +69,7 @@ const ImageGallery: React.FC = () => {
     formData.append("image", selectedFile);
 
     try {
-      await Api.post("/upload", formData, {
+      await axios.post("/images/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       fetchImages();
@@ -94,7 +92,7 @@ const ImageGallery: React.FC = () => {
   // Handle image deletion
   const handleDelete = async (imageId: string): Promise<void> => {
     try {
-      await Api.delete(`/images/${imageId}`);
+      await axios.delete(`/images/${imageId}`);
       fetchImages();
       toast({
         title: "Image Deleted",
