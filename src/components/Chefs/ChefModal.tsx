@@ -35,8 +35,6 @@ type ChefFormData = {
   name: string;
   gender: "male" | "female" | "other";
   profilePicture: File ;
-  resume: File ;
-  characterCertificate: File ;
   canCook: boolean;
   previousWorkplace: string[];
   readyForHomeKitchen: boolean;
@@ -75,10 +73,7 @@ const schema = yup.object().shape({
     .oneOf(["male", "female", "other"])
     .required("Gender is required"),
   profilePicture: yup.mixed<File>().required("Profile picture is required"),
-  resume: yup.mixed<File>().required("Resume is required"),
-  characterCertificate: yup
-    .mixed<File>()
-    .required("Character certificate is required"),
+  
   canCook: yup.boolean().required("Please answer if you can cook"),
   previousWorkplace: yup
     .array()
@@ -110,7 +105,7 @@ const schema = yup.object().shape({
 });
 
 interface ChefModalProps {
-  fetchChefs?: () => void;
+  fetchChefs: () => void;
 }
 
 const ChefModal = ({ fetchChefs }: ChefModalProps) => {
@@ -173,7 +168,7 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
       }
 
       setIsOpen(false);
-      fetchChefs?.();
+      fetchChefs();
       formMethods.reset();
     } catch (err: any) {
       setError(err.message);
@@ -271,25 +266,7 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
                 )}
               />
 
-              <Controller
-                name="resume"
-                control={formMethods.control}
-                render={({ field: { onChange, value, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>Resume</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        {...field}
-                        onChange={(e) => {
-                          onChange(e.target.files ? e.target.files[0] : null);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
 
               <FormField
                 name="currentCity"
@@ -424,25 +401,7 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
                 )}
               />
 
-              <Controller
-                name="characterCertificate"
-                control={formMethods.control}
-                render={({ field: { onChange, value, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>Character Certificate</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        {...field}
-                        onChange={(e) => {
-                          onChange(e.target.files ? e.target.files[0] : null);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
 
               <div className="grid grid-cols-2 gap-4">
               <FormField

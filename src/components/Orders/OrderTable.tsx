@@ -264,7 +264,7 @@ const OrderTable: React.FC<OrderTableProps> = ({
             }}
             disabled={currentPage === totalPages}
           >
-            h
+            
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
