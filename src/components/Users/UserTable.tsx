@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Search } from "lucide-react";
 import React, { useState } from "react";
@@ -36,7 +35,7 @@ interface User {
 interface UserTableProps {
   data: User[];
   type: string;
-  fetchChefs: () => void;
+  fetchChefs?: () => void;
 }
 
 const UserTable: React.FC<UserTableProps> = ({ data, type, fetchChefs }) => {
@@ -66,7 +65,7 @@ const UserTable: React.FC<UserTableProps> = ({ data, type, fetchChefs }) => {
         throw new Error(response.data.message || "Failed to create chef");
       }
       // if(type=='che')
-      fetchChefs();
+      fetchChefs?.();
     } catch (error) {
       console.log(error)
     }

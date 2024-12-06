@@ -105,7 +105,7 @@ const schema = yup.object().shape({
 });
 
 interface ChefModalProps {
-  fetchChefs: () => void;
+  fetchChefs?: () => void;
 }
 
 const ChefModal = ({ fetchChefs }: ChefModalProps) => {
@@ -168,7 +168,7 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
       }
 
       setIsOpen(false);
-      fetchChefs();
+      fetchChefs?.();
       formMethods.reset();
     } catch (err: any) {
       setError(err.message);
