@@ -18,8 +18,8 @@ interface Order {
   user: User;
   planID: string;
   totalPeople: number;
-  morningMealTime: string;
-  eveningMealTime: string;
+  morningMealTime?: string;
+  eveningMealTime?: string;
   chefDayOff: string;
   planStartDate: string;
   baseAmount: number;
@@ -67,6 +67,7 @@ const Orders: React.FC = () => {
       );
       if (response.data.success) {
         setOrders(response.data.data.orders);
+        console.log("orders",response.data.data.orders);
         setTotalPages(response.data.data.totalPages);
       } else {
         setError("Failed to fetch orders.");
@@ -96,8 +97,8 @@ const Orders: React.FC = () => {
 
   const filteredOrders = orders.filter(
     (order) =>
-      order.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+      order.user?.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.user?.lastName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const sortedOrders = [...filteredOrders].sort((a, b) => {
