@@ -4,6 +4,7 @@ import CouponManagement from "@/pages/CouponManagement";
 import Dashboard from "@/pages/Dashboard";
 import ImageGallery from "@/pages/ImagesGallery";
 import Login from "@/pages/Login";
+import NotificationPage from "@/pages/Notification";
 import Orders from "@/pages/Orders";
 import Plans from "@/pages/Plans";
 import Profile from "@/pages/Profile";
@@ -117,6 +118,16 @@ const Router: React.FC = () => {
             <ProtectedRoute>
               <Layout>
                 <Query />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notification"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <NotificationPage />
               </Layout>
             </ProtectedRoute>
           }

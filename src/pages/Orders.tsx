@@ -96,8 +96,8 @@ const Orders: React.FC = () => {
 
   const filteredOrders = orders.filter(
     (order) =>
-      order.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+      order?.user?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order?.user?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const sortedOrders = [...filteredOrders].sort((a, b) => {
