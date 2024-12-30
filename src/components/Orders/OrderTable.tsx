@@ -39,8 +39,8 @@ interface Order {
   user: User;
   planID: string;
   totalPeople: number;
-  morningMealTime: string;
-  eveningMealTime: string;
+  morningMealTime?: string;
+  eveningMealTime?: string;
   chefDayOff: string;
   planStartDate: string;
   baseAmount: number;
@@ -186,8 +186,8 @@ const OrderTable: React.FC<OrderTableProps> = ({
                 <TableCell>{order.totalPeople}</TableCell>
                 <TableCell>
                   <div className="text-sm">
-                    <div>Morning: {order.morningMealTime}</div>
-                    <div>Evening: {order.eveningMealTime}</div>
+                    <div>Morning: {order.morningMealTime?order.morningMealTime:"Not selected"}</div>
+                    <div>Evening: {order.eveningMealTime?order.eveningMealTime:"Not selected"}</div>
                   </div>
                 </TableCell>
                 <TableCell>{order.chefDayOff}</TableCell>
