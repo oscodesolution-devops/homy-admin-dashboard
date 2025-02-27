@@ -23,6 +23,7 @@ interface Chef {
   readyForHomeKitchen: boolean;
   resume?: string;
   travelMode: string;
+  verificationStatus:string;
   updatedAt: string;
   __v: number;
 }
@@ -101,6 +102,7 @@ const ChefService = () => {
       experience: chef.experienceYears,
       rating: 'N/A', // No rating in new interface
       speciality: chef.cuisines.join(', '),
+      verificationStatus:chef.verificationStatus,
       status: chef.canCook ? 'Active' : 'Inactive'
     }));
   };

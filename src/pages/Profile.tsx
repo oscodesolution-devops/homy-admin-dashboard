@@ -8,12 +8,14 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import customer from "../assets/Profile Boy Icon.svg"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import Swal from 'sweetalert2'
 
 const Profile = () => {
   const { userId } = useParams<{ userId: string }>()
   const [user, setUser] = useState<any>(null)
   const [userDetails, setUserDetails] = useState<any>(null)
   const [chef, setChef] = useState<any>(null)
+  const [verificationStatus,setVerificationStatus] = useState<string>("")
   const location = useLocation()
   const { role } = location.state || {}
   const navigate = useNavigate()
@@ -43,6 +45,7 @@ const Profile = () => {
       })
       console.log(data)
       setChef(data.data.chef)
+      setVerificationStatus(data.data.chef.verificationStatus)
     } catch (error) {
       console.log(error)
     }
@@ -54,6 +57,46 @@ const Profile = () => {
       fetchChefDetails()
     }
   }, [])
+
+  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatus = e.target.value;
+  
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `Do you really want to change the verification status to "${newStatus}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, update it!"
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await axios.post(`/admin/updateVerificationStatusChef`,{ verificationStatus: newStatus,chefId: userId},
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          }
+        );
+  
+        setVerificationStatus(newStatus);
+  
+        Swal.fire({
+          title: "Updated!",
+          text: "Verification status updated successfully!",
+          icon: "success"
+        });
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to update verification status. Please try again.",
+          icon: "error"
+        });
+      }
+    }
+  };
+  
 
   const handleDialogClose = () => {
     navigate("/usermanagement")
@@ -118,66 +161,81 @@ const Profile = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
-              {!chef && <UserCalendar userId={userId}/>}
+              <div className="md:col-span-2">
+                {!chef && <UserCalendar userId={userId} />}
               </div>
               <div className="space-y-1">
                 <Label>Full Name</Label>
                 <p>{chef ? chef.name : `${user.firstName} ${user.lastName}`}</p>
               </div>
-              
+
               <div className="space-y-1">
                 <Label>Email</Label>
                 <p>{chef ? "N/A" : user.email}</p>
               </div>
-              
+
               {chef ? (
                 <>
-                <div className="space-y-1">
-                  <Label>Gender</Label>
-                  <p>{chef.gender}</p>
-                </div>
-                <div className="space-y-1">
-                  <Label>Experience</Label>
-                  <p>{chef.experienceYears}</p>
-                </div>
-                <div className="space-y-1">
-                  <Label>Cuisines</Label>
-                  <p>{chef.cuisines.join(", ")}</p>
-                </div>
-                <div className="space-y-1">
-                  <Label>Current Area</Label>
-                  <p>{chef.currentArea}</p>
-                </div>
-                <div className="space-y-1">
-                  <Label>Current City</Label>
-                  <p>{chef.currentCity}</p>
-                </div>
-                <div className="space-y-1">
-                  <Label>Travel Mode</Label>
-                  <p>{chef.travelMode}</p>
-                </div>
-                <div className="space-y-1">
-                  <Label>Resume</Label>
-                  <a href={chef.resume} target="_blank" rel="noreferrer">
-                  <span className="text-red-500">
-                    View Resume
-                    </span>
-                  </a>
-                </div>
-                <div className="space-y-1">
-                  <Label>Character Certificate</Label>
-                  <a
-                    href={chef.characterCertificate}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <span className="text-red-500">
-                    View Certificate
-                    </span>
-                  </a>
-                </div>
-              </>
+                  <div className="space-y-1">
+                    <Label>Gender</Label>
+                    <p>{chef.gender}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Experience</Label>
+                    <p>{chef.experienceYears}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Cuisines</Label>
+                    <p>{chef.cuisines.join(", ")}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Status</Label>
+                    {/* <p>{chef.verificationStatus}</p> */}
+                    <p>
+                    <select
+                      value={verificationStatus}
+                      onChange={handleStatusChange}
+                      className="border rounded px-2 "
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Verified">Verified</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Current Area</Label>
+                    <p>{chef.currentArea}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Current City</Label>
+                    <p>{chef.currentCity}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Travel Mode</Label>
+                    <p>{chef.travelMode}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Resume</Label>
+                    <a href={chef.resume} target="_blank" rel="noreferrer">
+                      <span className="text-red-500">
+                        View Resume
+                      </span>
+                    </a>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Character Certificate</Label>
+                    <a
+                      href={chef.characterCertificate}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <span className="text-red-500">
+                        View Certificate
+                      </span>
+                    </a>
+                  </div>
+                </>
               ) : (
                 <>
                   <div className="space-y-1">

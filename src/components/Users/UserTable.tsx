@@ -27,6 +27,7 @@ interface User {
   rating?: number | string;
   speciality?: string; // converting array to string
   status?: string;
+  verificationStatus:string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -41,7 +42,6 @@ interface UserTableProps {
 const UserTable: React.FC<UserTableProps> = ({ data, type, fetchChefs }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const navigate = useNavigate();
-
   const filteredUsers = data.filter(
     (user) =>
       user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -53,7 +53,7 @@ const UserTable: React.FC<UserTableProps> = ({ data, type, fetchChefs }) => {
   const handleUserClick = (userId: string) => {
     navigate(`/users/${userId}`, { state: { role: type } });
   };
-  const handleDeleteChef =async (chefId: string) => {
+  const handleDeleteChef = async (chefId: string) => {
     try {
       const response = await axios.delete(`/admin/chef/${chefId}`, {
         headers: {
@@ -93,6 +93,7 @@ const UserTable: React.FC<UserTableProps> = ({ data, type, fetchChefs }) => {
             <TableHead>Last Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>{type == "chef" ? "Rating" : "Phone Number"}</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -108,6 +109,7 @@ const UserTable: React.FC<UserTableProps> = ({ data, type, fetchChefs }) => {
               <TableCell>
                 {type == "chef" ? user.rating : user.phoneNumber}
               </TableCell>
+              <TableCell>{user.verificationStatus}</TableCell>
               <TableCell>
                 <Button
                   onClick={() => handleUserClick(user._id)}

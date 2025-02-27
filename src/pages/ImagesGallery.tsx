@@ -118,7 +118,7 @@ const ImageGallery: React.FC = () => {
 
   const fetchBanners = async()=>{
     try {
-      const response = await axios.get("https://www.admin.thehomy.in/banner",{
+      const response = await axios.get("http://localhost:3000/banner",{
         headers:{
           Authorization:`Bearer ${localStorage.getItem("token")}`
         }

@@ -19,12 +19,12 @@ import {
 interface Chef {
   _id: string;
   name: string;
-  
+
 }
 
 interface AssignChefButtonProps {
   orderId: string;
-  fetchOrders:()=>void;
+  fetchOrders: () => void;
 }
 
 export function AssignChefButton({ orderId, fetchOrders }: AssignChefButtonProps) {
@@ -75,7 +75,7 @@ export function AssignChefButton({ orderId, fetchOrders }: AssignChefButtonProps
         }
       );
       console.log(response)
-      if (response.status==200) {
+      if (response.status == 200) {
         console.log("Chef assigned successfully:", response.data);
         setIsOpen(false);
         fetchOrders();
@@ -120,7 +120,7 @@ export function AssignChefButton({ orderId, fetchOrders }: AssignChefButtonProps
               </SelectContent>
             </Select>
           )}
-         <Button onClick={handleAssign} disabled={!selectedChef || assigning}>
+          <Button onClick={handleAssign} disabled={!selectedChef || assigning}>
             {assigning ? "Assigning..." : "Assign"}
           </Button>
         </div>

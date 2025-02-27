@@ -34,7 +34,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 type ChefFormData = {
   name: string;
   gender: "male" | "female" | "other";
-  profilePicture: File ;
+  profilePicture: File;
   canCook: boolean;
   previousWorkplace: string[];
   readyForHomeKitchen: boolean;
@@ -47,6 +47,7 @@ type ChefFormData = {
   readingLanguage: string;
   experienceYears: string;
   currentSalary: number;
+  PhoneNo:number;
 };
 
 // Constants remain the same
@@ -73,7 +74,7 @@ const schema = yup.object().shape({
     .oneOf(["male", "female", "other"])
     .required("Gender is required"),
   profilePicture: yup.mixed<File>().required("Profile picture is required"),
-  
+
   canCook: yup.boolean().required("Please answer if you can cook"),
   previousWorkplace: yup
     .array()
@@ -114,7 +115,7 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
   const [error, setError] = useState("");
 
   // Initialize the form with validation schema
-  const formMethods = useForm<ChefFormData|any>({
+  const formMethods = useForm<ChefFormData | any>({
     resolver: yupResolver(schema),
     defaultValues: {
       name: "",
@@ -134,13 +135,14 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
       readingLanguage: "",
       experienceYears: "",
       currentSalary: 0,
+      PhoneNo:0
     },
   });
 
   const onSubmit: SubmitHandler<ChefFormData> = async (data) => {
-    
+
     try {
-      console.log("fff",data)
+      console.log("fff", data)
       setIsLoading(true);
       setError("");
 
@@ -197,9 +199,9 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
 
         <Form {...formMethods}>
           <form
-            onSubmit={(e)=>{
+            onSubmit={(e) => {
               e.preventDefault()
-              console.log("hello",formMethods.getValues())
+              console.log("hello", formMethods.getValues())
               onSubmit(formMethods.getValues())
             }}
             className="grid grid-cols-2 gap-4"
@@ -266,7 +268,7 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
                 )}
               />
 
-              
+
 
               <FormField
                 name="currentCity"
@@ -295,6 +297,21 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                name="PhoneNo"
+                control={formMethods.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>PhoneNo</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
             </div>
 
             <div className="space-y-4">
@@ -331,8 +348,8 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
                               const updatedValue = checked
                                 ? [...field.value, cuisine]
                                 : field.value.filter(
-                                    (value:any) => value !== cuisine
-                                  );
+                                  (value: any) => value !== cuisine
+                                );
                               field.onChange(updatedValue);
                             }}
                           />
@@ -401,10 +418,10 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
                 )}
               />
 
-              
+
 
               <div className="grid grid-cols-2 gap-4">
-              <FormField
+                <FormField
                   name="canCook"
                   control={formMethods.control}
                   render={({ field }) => (
