@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { QuestionMarkIcon } from "@radix-ui/react-icons";
-import { Bell, ChefHat, Code, FileText, GalleryThumbnails, LayoutDashboard, LogOut, SubscriptIcon, Users } from "lucide-react";
+import { Bell, ChefHat, Code, FileText, GalleryThumbnails, LayoutDashboard, LogOut, SubscriptIcon, User, Users } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -28,6 +28,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveTab }) => {
         { name: "Plans", icon: SubscriptIcon, target: '/plans' },
         { name: "Query", icon: QuestionMarkIcon, target: '/query' },
         { name: "Notification", icon: Bell, target: '/notification' },
+        { name: "Community", icon: Users, target: '/community' },
+
     ], []);
 
     const handleNavClick = (clickedItem: NavOption) => {

@@ -94,10 +94,10 @@ const ChefService = () => {
   }
 
   const formatChefData = (chefs: Chef[]) => {
-    return chefs.map(chef => ({
+    return chefs?.map(chef => ({
       _id: chef._id,
-      firstName: chef.name.split(' ')[0], // Splitting name into first and last
-      lastName: chef.name.split(' ').slice(1).join(' '),
+      firstName: chef.name?.split(' ')[0], // Splitting name into first and last
+      lastName: chef.name?.split(' ').slice(1).join(' '),
       email: chef.email || 'N/A',
       experience: chef.experienceYears,
       rating: 'N/A', // No rating in new interface

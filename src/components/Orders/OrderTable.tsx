@@ -110,7 +110,7 @@ const OrderTable: React.FC<OrderTableProps> = ({
     });
   };
 
-
+  
   return (
     <div className="container mx-auto py-10">
       <div className="flex items-center justify-between mb-4">
@@ -207,10 +207,11 @@ const OrderTable: React.FC<OrderTableProps> = ({
                     <span className="text-sm text-gray-600">{`${order.chef.name}`}</span>
                   ) : (
                     // <></>
+                    order.status=="confirmed"?
                     <AssignChefButton
                       orderId={order._id}
                       fetchOrders={fetchOrders}
-                    />
+                    />:""
                   )}
                 </TableCell>
                 <TableCell>{formatDate(order.createdAt)}</TableCell>

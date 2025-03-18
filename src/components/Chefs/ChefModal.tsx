@@ -305,7 +305,7 @@ const ChefModal = ({ fetchChefs }: ChefModalProps) => {
                   <FormItem>
                     <FormLabel>PhoneNo</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} placeholder="without +91 (country code)"/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

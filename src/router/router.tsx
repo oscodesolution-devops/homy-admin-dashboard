@@ -10,6 +10,7 @@ import Plans from "@/pages/Plans";
 import Profile from "@/pages/Profile";
 import Query from "@/pages/Query";
 import UserManagement from "@/pages/UserManagement";
+import CommunityPage from "@/pages/Community";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 const isAuthenticated = () => {
@@ -128,6 +129,16 @@ const Router: React.FC = () => {
             <ProtectedRoute>
               <Layout>
                 <NotificationPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/community"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CommunityPage />
               </Layout>
             </ProtectedRoute>
           }
