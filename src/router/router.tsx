@@ -12,6 +12,7 @@ import Query from "@/pages/Query";
 import UserManagement from "@/pages/UserManagement";
 import CommunityPage from "@/pages/Community";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import TicketPage from "@/pages/Ticket";
 
 const isAuthenticated = () => {
   // Replace this with your actual authentication check
@@ -48,7 +49,7 @@ const Router: React.FC = () => {
           element={
             <ProtectedRoute>
               <Layout>
-                <UserManagement/>
+                <UserManagement />
               </Layout>
             </ProtectedRoute>
           }
@@ -58,7 +59,7 @@ const Router: React.FC = () => {
           element={
             <ProtectedRoute>
               <Layout>
-                <Orders/>
+                <Orders />
               </Layout>
             </ProtectedRoute>
           }
@@ -78,7 +79,7 @@ const Router: React.FC = () => {
           element={
             <ProtectedRoute>
               <Layout>
-                <ChefService/>
+                <ChefService />
               </Layout>
             </ProtectedRoute>
           }
@@ -88,7 +89,7 @@ const Router: React.FC = () => {
           element={
             <ProtectedRoute>
               <Layout>
-                <CouponManagement/>
+                <CouponManagement />
               </Layout>
             </ProtectedRoute>
           }
@@ -98,7 +99,7 @@ const Router: React.FC = () => {
           element={
             <ProtectedRoute>
               <Layout>
-                <ImageGallery/>
+                <ImageGallery />
               </Layout>
             </ProtectedRoute>
           }
@@ -143,6 +144,19 @@ const Router: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/ticket"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <TicketPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+
         {/* Redirect to dashboard if the route doesn't match */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

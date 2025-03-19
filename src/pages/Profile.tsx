@@ -15,7 +15,7 @@ const Profile = () => {
   const [user, setUser] = useState<any>(null)
   const [userDetails, setUserDetails] = useState<any>(null)
   const [chef, setChef] = useState<any>(null)
-  const [verificationStatus,setVerificationStatus] = useState<string>("")
+  const [verificationStatus, setVerificationStatus] = useState<string>("")
   const location = useLocation()
   const { role } = location.state || {}
   const navigate = useNavigate()
@@ -60,7 +60,7 @@ const Profile = () => {
 
   const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value;
-  
+
     const result = await Swal.fire({
       title: "Are you sure?",
       text: `Do you really want to change the verification status to "${newStatus}"?`,
@@ -70,17 +70,17 @@ const Profile = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, update it!"
     });
-  
+
     if (result.isConfirmed) {
       try {
-        await axios.post(`/admin/updateVerificationStatusChef`,{ verificationStatus: newStatus,chefId: userId},
+        await axios.post(`/admin/updateVerificationStatusChef`, { verificationStatus: newStatus, chefId: userId },
           {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
           }
         );
-  
+
         setVerificationStatus(newStatus);
-  
+
         Swal.fire({
           title: "Updated!",
           text: "Verification status updated successfully!",
@@ -96,7 +96,7 @@ const Profile = () => {
       }
     }
   };
-  
+
 
   const handleDialogClose = () => {
     navigate("/usermanagement")
@@ -125,7 +125,7 @@ const Profile = () => {
     <main className="p-6 w-full flex justify-center gap-6">
       <div className="max-w-4xl w-full p-6 flex items-center space-x-6">
         {/* Profile Section */}
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center self-start space-y-4">
           <div className="relative">
             <img
               src={role === "chef" ? chef.profilePicture : customer}
@@ -176,65 +176,157 @@ const Profile = () => {
 
               {chef ? (
                 <>
-                  <div className="space-y-1">
-                    <Label>Gender</Label>
-                    <p>{chef.gender}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Experience</Label>
-                    <p>{chef.experienceYears}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Cuisines</Label>
-                    <p>{chef.cuisines.join(", ")}</p>
-                  </div>
+                  {chef?.gender && (
+                    <div className="space-y-1">
+                      <Label>Gender</Label>
+                      <p>{chef.gender}</p>
+                    </div>
+                  )}
+                  {chef?.experienceYears !== undefined && chef?.experienceYears !== null && (
+                    <div className="space-y-1">
+                      <Label>Experience</Label>
+                      <p>{chef.experienceYears}</p>
+                    </div>
+                  )}
+
+                  {(chef?.cuisines?.length > 0 || chef?.chefServices?.length > 0) && (
+                    <div className="space-y-1">
+                      <Label>Cuisines</Label>
+                      <p>{chef.cuisines?.length > 0 ? chef.cuisines.join(", ") : chef.chefServices.join(", ")}</p>
+                    </div>
+                  )}
                   <div className="space-y-1">
                     <Label>Status</Label>
                     {/* <p>{chef.verificationStatus}</p> */}
                     <p>
-                    <select
-                      value={verificationStatus}
-                      onChange={handleStatusChange}
-                      className="border rounded px-2 "
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Verified">Verified</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
+                      <select
+                        value={verificationStatus}
+                        onChange={handleStatusChange}
+                        className="border rounded px-2 "
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Verified">Verified</option>
+                        <option value="Rejected">Rejected</option>
+                      </select>
                     </p>
                   </div>
-                  <div className="space-y-1">
-                    <Label>Current Area</Label>
-                    <p>{chef.currentArea}</p>
-                  </div>
+                  {(chef?.currentArea || chef?.address?.address1 || chef?.address?.state || chef?.address?.pincode) && (
+                    <div className="space-y-1">
+                      <Label>Current Area</Label>
+                      <p>
+                        {chef?.currentArea || [chef?.address?.address1, chef?.address?.state, chef?.address.pincode]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </p>
+                    </div>
+                  )}
                   <div className="space-y-1">
                     <Label>Current City</Label>
-                    <p>{chef.currentCity}</p>
+                    <p>{chef.currentCity || `${chef.address.city || ""}`}</p>
                   </div>
-                  <div className="space-y-1">
-                    <Label>Travel Mode</Label>
-                    <p>{chef.travelMode}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Resume</Label>
-                    <a href={chef.resume} target="_blank" rel="noreferrer">
-                      <span className="text-red-500">
-                        View Resume
+                  {chef?.travelMode && (
+                    <div className="space-y-1">
+                      <Label>Travel Mode</Label>
+                      <p>{chef.travelMode}</p>
+                    </div>
+                  )}
+
+                  {chef?.bankDetails?.accountHolderName && (
+                    <div className="space-y-1">
+                      <Label>Account Holder Name</Label>
+                      <p>{chef.bankDetails.accountHolderName}</p>
+                    </div>
+                  )}
+
+                  {chef?.bankDetails?.accountNumber && (
+                    <div className="space-y-1">
+                      <Label>Account Number</Label>
+                      <p>{chef.bankDetails.accountNumber}</p>
+                    </div>
+                  )}
+
+                  {chef?.bankDetails?.branchName && (
+                    <div className="space-y-1">
+                      <Label>Branch Name</Label>
+                      <p>{chef.bankDetails.branchName}</p>
+                    </div>
+                  )}
+
+                  {chef?.bankDetails?.ifscCode && (
+                    <div className="space-y-1">
+                      <Label>IFSC Code</Label>
+                      <p>{chef.bankDetails.ifscCode}</p>
+                    </div>
+                  )}
+
+                  {chef?.bankDetails?.upiId && (
+                    <div className="space-y-1">
+                      <Label>UPI ID</Label>
+                      <p>{chef.bankDetails.upiId}</p>
+                    </div>
+                  )}
+
+                  {chef?.document?.type && (
+                    <div className="space-y-1">
+                      <Label>Document Type</Label>
+                      <span className="text-gray-800">
+                        <p>{chef.document.type}</p>
                       </span>
-                    </a>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Character Certificate</Label>
-                    <a
-                      href={chef.characterCertificate}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <span className="text-red-500">
-                        View Certificate
+                    </div>
+                  )}
+
+
+                  {chef?.document?.documentNo && (
+                    <div className="space-y-1">
+                      <Label>Document No</Label>
+                      <span className="text-gray-800">
+                        <p>{chef.document.documentNo}</p>
                       </span>
-                    </a>
-                  </div>
+                    </div>
+                  )}
+
+                  {(chef?.document?.docsPhoto?.front || chef?.document?.docsPhoto?.back) && (
+                    <div className="space-y-1">
+                      <Label>Document Picture</Label>
+
+                      {chef?.document?.docsPhoto?.front && (
+                        <a href={chef.document.docsPhoto.front} target="_blank" rel="noreferrer">
+                          <span className="text-red-500">
+                            <p className="cursor-pointer">View Front</p>
+                          </span>
+                        </a>
+                      )}
+
+                      {chef?.document?.docsPhoto?.back && (
+                        <a href={chef.document.docsPhoto.back} target="_blank" rel="noreferrer">
+                          <span className="text-red-500">
+                            <p className="cursor-pointer">View Back</p>
+                          </span>
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  {chef?.resume && (
+                    <div className="space-y-1">
+                      <Label>Resume</Label>
+                      <a href={chef.resume} target="_blank" rel="noreferrer">
+                        <span className="text-red-500">
+                          <p>View Resume</p>
+                        </span>
+                      </a>
+                    </div>
+                  )}
+
+                  {chef?.characterCertificate && (
+                    <div className="space-y-1">
+                      <Label>Character Certificate</Label>
+                      <a href={chef.characterCertificate} target="_blank" rel="noreferrer">
+                        <span className="text-red-500">View Certificate</span>
+                      </a>
+                    </div>
+                  )}
+
                 </>
               ) : (
                 <>
